@@ -3,6 +3,7 @@ package handler
 import (
 	"crowdfunding/helper"
 	"crowdfunding/user"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -129,6 +130,59 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	}
 
 	response := helper.APIResponse(metaMessage, http.StatusOK, "success", data)
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) UploadedAvatar(c *gin.Context) {
+	//input dari user. bukan json parameternya
+	//simpan gambar di folder "images/"
+	//di service panggil repo untuk 1. siapa yang akses (pake JWT) 2. repo ambil data user yang sesuai
+	//repo update data simpan ke lokasi file
+
+	file, err := c.FormFile("avatar")
+
+	if err != nil {
+
+		data := gin.H{"is_uploaded": false}
+
+		response := helper.APIResponse("Failed to uplload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	userID := 1
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+
+		data := gin.H{"is_uploaded": false}
+
+		response := helper.APIResponse("Failed to uplload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	//harusnay dapet dari JWD
+
+	_, err = h.userService.SaveAvatar(userID, path)
+
+	if err != nil {
+
+		data := gin.H{"is_uploaded": false}
+
+		response := helper.APIResponse("Failed to uplload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	data := gin.H{"is_uploaded": true}
+
+	response := helper.APIResponse("Avatar succesfully uploaded", http.StatusOK, "success", data)
 
 	c.JSON(http.StatusOK, response)
 }
