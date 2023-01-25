@@ -18,26 +18,6 @@ import (
 )
 
 func main() {
-	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-
-	// fmt.Println("Connection worked. Good job!")
-
-	// var users []user.User
-	// length := len(users)
-
-	// fmt.Println(length)
-
-	// db.Find(&users)
-
-	// length = len(users)
-	// fmt.Println(length)
-
-	// for _, user := range users {
-	// 	fmt.Println(user.ID)
-	// 	fmt.Println(user.Email)
-	// 	fmt.Println(user.Name)
-	// }
-
 	dsn := "root:root@tcp(127.0.0.1:3306)/crowdfunding?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
@@ -48,41 +28,17 @@ func main() {
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
 
-	campaigns, err := campaignRepository.FindByUserID(17)
+	userService := user.NewService(userRepository)
+	campaignService := campaign.NewService(campaignRepository)
+
+	//tes campaign service
+	campaigns, err := campaignService.FindCampaigns(17)
 
 	fmt.Println(len(campaigns))
 
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-		if len(campaign.CampaignImages) > 0 {
-			fmt.Println(campaign.CampaignImages[0].FileName)
-		}
-
-	}
-
-	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
-
-	//fmt.Println(authService.GenerateToken(100))
-
-	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxN30.VwrFwsrSR5kFpprxLNRubrnEOn7Uqy1GJaxAlZk1aOo")
-	// if err != nil {
-	// 	fmt.Println("ERROR")
-	// 	fmt.Println("ERROR")
-	// 	fmt.Println("ERROR")
-	// }
-
-	// if token.Valid {
-	// 	fmt.Println("VALID")
-	// 	fmt.Println("VALID")
-	// 	fmt.Println("VALID")
-	// } else {
-	// 	fmt.Println("INVALID")
-	// 	fmt.Println("INVALID")
-	// 	fmt.Println("INVALID")
-	// }
 
 	router := gin.Default()
 	api := router.Group("api/v1")
@@ -93,19 +49,7 @@ func main() {
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadedAvatar)
 
 	router.Run()
-	// userInput := user.RegisterUserInput{}
-	// userInput.Name = "Tes dari service"
-	// userInput.Email = "dariservice@gmail.com"
-	// userInput.Occupation = "Tukang Pos"
-	// userInput.Password = "password"
 
-	// userService.RegisterUser(userInput)
-
-	// user := user.User{
-	// 	Name: "Test",
-	// }
-
-	// userRepository.Save(user)
 }
 
 func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
