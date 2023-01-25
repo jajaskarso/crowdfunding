@@ -17,4 +17,5 @@ func FormatUser(user User, token string) UserFormatter {
 		Token:      token,
 	}
 	return formatter
+
 }
