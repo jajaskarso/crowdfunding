@@ -56,7 +56,7 @@ func (s *service) CreateCampaign(input CreateCampaignInput) (Campaign, error) {
 	campaign.User.ID = input.User.ID
 
 	//buat slug
-	campaignCandidate := fmt.Sprintf("%s %s", input.Name, input.User.ID)
+	campaignCandidate := fmt.Sprintf("%s %d", input.Name, input.User.ID)
 	campaign.Slug = slug.Make(campaignCandidate)
 
 	//balikan
