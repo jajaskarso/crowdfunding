@@ -119,6 +119,12 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
 		return
 	}
 
+	// ambil jwt
+
+	currentUser := c.MustGet("currentUser").(user.User)
+
+	inputData.User = currentUser
+
 	// update
 	updatedCampaign, err := h.service.UpdateCampaign(inputID, inputData)
 	if err != nil {
