@@ -53,12 +53,12 @@ func (r *repository) FindByID(ID int) (Campaign, error) {
 	return campaign, err
 }
 
-// func (r *repository) Save(campaign Campaign) (Campaign, error) {
-// 	err := r.db.Create(&campaign).Error
+func (r *repository) Save(campaign Campaign) (Campaign, error) {
+	err := r.db.Create(&campaign).Error
 
-// 	if err != nil {
-// 		return campaign, err
-// 	}
+	if err != nil {
+		return campaign, err
+	}
 
-// 	return campaign, nil
-// }
+	return campaign, nil
+}
